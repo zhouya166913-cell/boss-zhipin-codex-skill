@@ -18,6 +18,9 @@ resumes/
 exports/
 logs/
 *.resume.md
+*.sqlite
+*.sqlite3
+*.db
 
 # 编辑器和系统文件
 .DS_Store

@@ -1,6 +1,6 @@
 interface:
   display_name: "BOSS 直聘助手"
-  short_description: "安全连接 BOSS 直聘，辅助岗位、候选人和沟通管理"
-  default_prompt: "使用 $boss-zhipin 检查登录状态，并先以只读方式查看我的招聘岗位。"
+  short_description: "执行岗位画像、候选人筛选、个性化沟通和面试跟进"
+  default_prompt: "使用 $boss-zhipin 根据我的岗位需求筛选候选人，先建立岗位画像并只读查看现有岗位。"
 policy:
   allow_implicit_invocation: true
