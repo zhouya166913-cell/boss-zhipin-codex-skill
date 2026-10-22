@@ -1,0 +1,26 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# BOSS 登录凭证、会话与本地配置
+credential.json
+session*.json
+config.local.*
+*.cookie
+cookies*.txt
+
+# 候选人、简历、聊天及导出数据
+candidates*.csv
+candidates*.json
+resumes/
+exports/
+logs/
+*.resume.md
+
+# 编辑器和系统文件
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
