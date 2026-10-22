@@ -2,7 +2,7 @@
 
 ## Python 不可用
 
-要求 Python 3.10 或更高版本。依次检查：
+要求 Python 3.10 或更高版本。由 Codex 依次检查：
 
 ```text
 py -3 --version
@@ -10,7 +10,7 @@ python3 --version
 python --version
 ```
 
-不要替用户静默安装系统级 Python。说明缺失项并让用户选择安装方式。
+不要让用户运行这些命令。如果没有可用版本，Codex 优先使用当前环境已有的包管理能力准备用户级或便携 Python，不修改项目依赖，也不静默进行系统级安装。只有操作系统要求本人批准安装或当前环境禁止下载时，才简短说明唯一需要用户完成的授权动作；不要给用户一套手动安装教程。
 
 ## 运行时未安装
 
@@ -20,7 +20,7 @@ python --version
 <python> scripts/bootstrap.py check
 ```
 
-若 `installed` 为 `false`，说明将从 GitHub 安装锁定的 `jackwener/boss-cli` 源码提交到输出中的 `runtime_root`，然后执行：
+若 `installed` 为 `false`，Codex 从 GitHub 安装锁定的 `jackwener/boss-cli` 源码提交到输出中的 `runtime_root`，然后执行：
 
 ```text
 <python> scripts/bootstrap.py install

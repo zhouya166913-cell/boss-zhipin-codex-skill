@@ -4,22 +4,39 @@
 
 > 非 BOSS 直聘官方项目。BOSS 直聘没有面向公众的通用招聘开放 API。本项目依赖社区维护的 `jackwener/boss-cli` 锁定源码提交和用户本人的登录态，使用前请评估平台协议、账号风控和候选人隐私要求。
 
-## 交给 Codex 安装
+## 客户唯一使用方式
 
-将下面这句话发给 Codex：
-
-```text
-请安装并使用这个 Skill：https://github.com/zhouya166913-cell/boss-zhipin-codex-skill
-先检查环境和登录状态。根据我的招聘需求建立岗位画像，然后只读查看现有岗位，不要立即发送消息或批量操作。
-```
-
-也可以手动安装：
+客户不需要安装 Skill、Python 或任何命令行工具，也不需要理解岗位 ID。只需把本项目地址和想做的事情一起发给 Codex：
 
 ```text
-npx skills add https://github.com/zhouya166913-cell/boss-zhipin-codex-skill -y -g
+使用这个地址帮我操作 BOSS 直聘：
+https://github.com/zhouya166913-cell/boss-zhipin-codex-skill
+
+我要招聘一名上海的企业 AI 咨询顾问。你先查看我已有的岗位和候选人，
+信息不够就直接问我，但不要让我安装东西或运行命令。
 ```
 
-安装 Skill 后，首次使用时 Codex 会：
+客户也可以只说一句很口语的话：
+
+```text
+用这个项目帮我从 BOSS 招一个销售，合适的先挑出来给我看：
+https://github.com/zhouya166913-cell/boss-zhipin-codex-skill
+```
+
+如果客户只发送地址，Codex 会先问他要招聘人才还是找工作。客户不需要重新组织一份完整需求。
+
+## 给读取本页的 Codex
+
+如果你是因为用户提供了本仓库地址而读到这里，不要停留在项目介绍，也不要输出手动安装教程。立即读取 [SKILL.md](SKILL.md) 和其中按任务路由的参考文件，然后：
+
+1. 自行获取项目并检查运行环境；
+2. 自行创建隔离运行时并准备固定依赖；
+3. 只在需要时请用户本人完成 BOSS 扫码或浏览器登录；
+4. 先做不产生副作用的岗位和需求确认；
+5. 信息不足时按照 [自然语言理解与主动反问](references/conversation-intake.md) 提问；
+6. 发送消息、邀约、岗位修改和数据导出前，按照 `SKILL.md` 取得明确确认。
+
+首次使用时 Codex 会自行：
 
 1. 检查 Python 3.10+；
 2. 在用户目录创建隔离虚拟环境；
@@ -27,6 +44,8 @@ npx skills add https://github.com/zhouya166913-cell/boss-zhipin-codex-skill -y -
 4. 引导用户本人扫码或使用本机浏览器登录；
 5. 先验证登录和只读能力；
 6. 仅在用户明确确认后执行消息、邀约、岗位修改和数据导出。
+
+环境缺失或准备失败时，Codex 应先按故障文档自行处理。只有操作系统权限、网络许可或本人登录确实需要用户动作时，才告诉用户点击或扫码，不把安装步骤转交给用户。
 
 ## 能力范围
 
@@ -56,6 +75,8 @@ npx skills add https://github.com/zhouya166913-cell/boss-zhipin-codex-skill -y -
 涉及薪资、Offer、投诉或个人隐私时停止并通知我。
 ```
 
+信息不完整时，Codex 不会机械地让客户填写表格。例如客户只说“帮我招一个销售”，Codex 会先只读查看已有岗位：唯一匹配时直接继续；有多个销售岗位时只让客户选择具体岗位；没有对应岗位时再询问岗位城市和核心职责。初筛数量等非关键项可以使用安全默认值，发送、面试和 Offer 等关键动作不能靠猜测。
+
 ## 当前边界
 
 - 可以读取和管理已有岗位，但当前底层不能在 BOSS 创建新岗位；Codex 可以生成完整 JD，用户发布后再继续。
@@ -69,7 +90,7 @@ npx skills add https://github.com/zhouya166913-cell/boss-zhipin-codex-skill -y -
 - 查看推荐、投递和面试记录；
 - 经确认后向招聘者打招呼。
 
-## 本地自检
+## 维护者自检
 
 ```text
 python -m unittest discover -s tests -v
