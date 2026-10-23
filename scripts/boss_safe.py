@@ -5,11 +5,12 @@ from __future__ import annotations
 
 import argparse
 import os
+from pathlib import Path
 import subprocess
 import sys
 from typing import Sequence
 
-from bootstrap import boss_executable
+from bootstrap import boss_executable, runtime_python
 
 
 TOP_LEVEL_REMOTE_WRITES = {"greet", "batch-greet"}
@@ -149,21 +150,30 @@ def main() -> int:
         return 2
 
     executable = boss_executable()
-    if not executable.is_file():
+    python_executable = runtime_python()
+    compatibility_entrypoint = Path(__file__).with_name("boss_cli_compat.py")
+    if not executable.is_file() or not python_executable.is_file():
         print(
             "尚未安装隔离运行时。请先执行：python scripts/bootstrap.py install",
             file=sys.stderr,
         )
         return 3
+    if not compatibility_entrypoint.is_file():
+        print("缺少 BOSS CLI 兼容入口，无法安全启动。", file=sys.stderr)
+        return 4
 
     try:
         environment = os.environ.copy()
         environment.setdefault("PYTHONUTF8", "1")
         environment.setdefault("PYTHONIOENCODING", "utf-8")
-        completed = subprocess.run([str(executable), *command], check=False, env=environment)
+        completed = subprocess.run(
+            [str(python_executable), str(compatibility_entrypoint), *command],
+            check=False,
+            env=environment,
+        )
     except OSError as exc:
         print(f"无法启动 boss-cli：{exc}", file=sys.stderr)
-        return 4
+        return 5
     return completed.returncode
 
 

@@ -4,6 +4,7 @@ import importlib.util
 from pathlib import Path
 import sys
 import unittest
+from unittest.mock import Mock, patch
 
 
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
@@ -57,6 +58,29 @@ class ClassificationTests(unittest.TestCase):
         for command in (["future-command"], ["recruiter", "future-command"]):
             self.assertEqual(BOSS_SAFE.classify(command), "unknown")
             self.assertIsNotNone(BOSS_SAFE.validate(command, True, True))
+
+
+class EntrypointTests(unittest.TestCase):
+    def test_main_runs_cli_through_compatibility_entrypoint(self) -> None:
+        fake_completed = Mock(returncode=0)
+        scripts = Path(BOSS_SAFE.__file__).resolve().parent
+        with (
+            patch.object(BOSS_SAFE, "boss_executable", return_value=scripts / "boss_safe.py"),
+            patch.object(BOSS_SAFE, "runtime_python", return_value=Path(sys.executable)),
+            patch.object(BOSS_SAFE, "build_parser") as build_parser,
+            patch.object(BOSS_SAFE.subprocess, "run", return_value=fake_completed) as run,
+        ):
+            build_parser.return_value.parse_args.return_value = Mock(
+                boss_args=["recruiter", "inbox", "--json"],
+                confirm_write=False,
+                allow_batch=False,
+            )
+            self.assertEqual(BOSS_SAFE.main(), 0)
+
+        invoked = run.call_args.args[0]
+        self.assertEqual(invoked[0], sys.executable)
+        self.assertEqual(Path(invoked[1]).name, "boss_cli_compat.py")
+        self.assertEqual(invoked[2:], ["recruiter", "inbox", "--json"])
 
 
 if __name__ == "__main__":
