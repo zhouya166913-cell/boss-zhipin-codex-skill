@@ -42,7 +42,14 @@ description: 连接 BOSS 直聘并执行招聘工作流，包括岗位画像、�
 - `login` 必须由用户本人完成扫码或浏览器登录。不要索要 Cookie 文本。
 - `status` 成功后，再执行实际业务命令。
 - 如果 Python 低于 3.10、安装失败或登录失败，读取 [references/troubleshooting.md](references/troubleshooting.md)。
+- 如果出现登录成功后反复掉线，同一任务只允许自动刷新凭证并复验一次；再次失败时停止重新登录循环，读取 [references/secondary-development.md](references/secondary-development.md) 的会话诊断流程。招聘场景以招聘端只读命令是否成功作为最终判断，不能只依赖求职端健康探针。
 - 这些命令由 Codex 执行。除非用户主动排查技术问题，不把命令作为操作步骤交给用户。
+
+## 自然语言二次开发
+
+当用户要求“修一下”“支持二次开发”“登录一直掉”“接口报错”“新增一个能力”时，读取 [references/secondary-development.md](references/secondary-development.md)。把当前仓库视为允许修改的本地二次开发项目：由 Codex 自行分类故障、取得脱敏证据、选择扩展点、完成最小改动并运行测试，不要求用户等待原维护者发布新版。
+
+二次开发不得扩大业务授权。接口适配、登录诊断和只读命令可以先修改并验证；发送消息、邀约、岗位修改、导出等远程或本地写操作仍遵守下文确认规则。无法在真实登录环境复现时，只能报告离线验证完成，不能声称平台问题已完全修复。
 
 ## 对话理解与主动反问
 
