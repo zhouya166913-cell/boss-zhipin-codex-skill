@@ -22,7 +22,7 @@
 以下命令必须先向用户展示对象与动作并取得明确确认，再添加 `--confirm-write`：
 
 ```text
-<python> scripts/boss_safe.py --confirm-write -- recruiter greet <候选人ID> --job <岗位ID> --json
+<python> scripts/boss_safe.py --confirm-write -- recruiter greet <候选人ID> --job <岗位ID> --security-id <安全ID> --expect-id <期望ID> --lid <推荐链路ID> --message "已确认或已授权生成的招呼语" --json
 <python> scripts/boss_safe.py --confirm-write -- recruiter reply <friendId> "已确认的消息" --yes --json
 <python> scripts/boss_safe.py --confirm-write -- recruiter request-resume <friendId> --yes --json
 <python> scripts/boss_safe.py --confirm-write -- recruiter exchange-phone <friendId> --yes --json
@@ -34,6 +34,10 @@
 ```
 
 不要自行补齐未知参数。先运行对应命令的 `--help`，再根据用户提供的信息构造命令。
+
+`recruiter greet` 已由 `scripts/boss_cli_compat.py` 修复为网页“打招呼”按钮对应的真实发起沟通请求。岗位 ID、候选人 ID、`securityId`、`expectId` 和 `lid` 都必须来自本次只读岗位/推荐结果，不能猜测，也不向用户索要。只有结构化结果为 `ok=true` 且 `data.geekId` 存在时才报告发送成功；旧版命令仅查看候选人，不得把查看结果当成打招呼。
+
+用户已给出 `SKILL.md` 所定义的一次性自动招呼授权时，可以在当前岗位和人数上限内顺序调用上述命令，不再逐人询问；每次仍使用 `--confirm-write`，并在任何一次失败后停止剩余发送。
 
 ## 批量查看
 

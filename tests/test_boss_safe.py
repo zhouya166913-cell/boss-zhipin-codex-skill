@@ -37,6 +37,23 @@ class ClassificationTests(unittest.TestCase):
         self.assertIsNotNone(BOSS_SAFE.validate(command, False, False))
         self.assertIsNone(BOSS_SAFE.validate(command, True, False))
 
+    def test_real_recruiter_greet_stays_guarded(self) -> None:
+        command = [
+            "recruiter",
+            "greet",
+            "candidate-token",
+            "--job",
+            "job-token",
+            "--security-id",
+            "security-token",
+            "--message",
+            "你好，想和你聊聊这个岗位。",
+            "--json",
+        ]
+        self.assertEqual(BOSS_SAFE.classify(command), "remote-write")
+        self.assertIsNotNone(BOSS_SAFE.validate(command, False, False))
+        self.assertIsNone(BOSS_SAFE.validate(command, True, False))
+
     def test_all_known_remote_writes_are_guarded(self) -> None:
         top_level = [[name, "target"] for name in BOSS_SAFE.TOP_LEVEL_REMOTE_WRITES]
         recruiter = [["recruiter", name, "target"] for name in BOSS_SAFE.RECRUITER_REMOTE_WRITES]
