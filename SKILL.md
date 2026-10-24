@@ -40,6 +40,7 @@ description: 连接 BOSS 直聘并执行招聘工作流，包括岗位画像、�
 
 - `check` 只检查环境，不安装依赖、不访问 BOSS。
 - `install` 创建隔离运行时并安装固定版本依赖。
+- `check` 的 `state` 决定下一步：`runtime_missing` 时自动安装，`runtime_incomplete` 时重新安装固定版本，`local_ready` 时才进入账号风险确认。`local_ready` 只表示本机工具就绪，不表示 BOSS 已登录。
 - `login` 是独立认证动作。只有用户明确确认账号由本人使用、当前设备和地点正常、且账号近期没有异常登录或 PC 端限制后，才添加 `--confirm-auth` 发起一次；扫码必须由用户本人完成。不要索要 Cookie 文本。
 - `status` 成功后，再执行实际业务命令。
 - 如果 Python 低于 3.10、安装失败或登录失败，读取 [references/troubleshooting.md](references/troubleshooting.md)。

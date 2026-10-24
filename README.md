@@ -47,6 +47,8 @@ https://github.com/zhouya166913-cell/boss-zhipin-codex-skill
 5. 先验证登录和只读能力；
 6. 仅在用户明确确认后执行消息、邀约、岗位修改和数据导出。
 
+环境检查会返回稳定状态：`runtime_missing` 表示需要自动安装，`runtime_incomplete` 表示需要重建固定运行时，`local_ready` 表示本机执行层可用并应进入账号风险确认。`local_ready` 不代表 BOSS 已登录。
+
 环境缺失或准备失败时，Codex 应先按故障文档自行处理。只有操作系统权限、网络许可或本人登录确实需要用户动作时，才告诉用户点击或扫码，不把安装步骤转交给用户。
 
 官方浏览器能够正常查看招聘页面，但 CLI 返回 `code=7` 或 `code=37` 时，说明浏览器与 CLI 会话分离，不代表项目已经打通。近期受限账号应停止 CLI，保留官方页面人工操作，由 Codex 或 WorkBuddy 只做离线分析和草稿生成。

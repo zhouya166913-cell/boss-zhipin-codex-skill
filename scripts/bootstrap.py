@@ -20,6 +20,7 @@ PACKAGE_SPEC = (
 )
 MIN_PYTHON = (3, 10)
 RUNTIME_ENV = "BOSS_ZHIPIN_SKILL_RUNTIME"
+SCHEMA_VERSION = 1
 
 
 def configure_utf8_console() -> None:
@@ -71,6 +72,8 @@ def command_output(command: list[str]) -> str | None:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             timeout=20,
         )
     except (OSError, subprocess.TimeoutExpired):
@@ -92,6 +95,8 @@ def recruiter_available(executable: Path | None = None) -> bool:
             check=False,
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             timeout=20,
             env=environment,
         )
@@ -101,19 +106,45 @@ def recruiter_available(executable: Path | None = None) -> bool:
     return result.returncode == 0 and "Commands:" in combined and "resume" in combined
 
 
+def readiness_state(
+    python_supported: bool,
+    installed: bool,
+    recruiter_ready: bool,
+) -> tuple[str, str]:
+    if not python_supported:
+        return "python_unsupported", "prepare_python"
+    if not installed:
+        return "runtime_missing", "install_runtime"
+    if not recruiter_ready:
+        return "runtime_incomplete", "reinstall_runtime"
+    return "local_ready", "confirm_account_safety"
+
+
 def status_payload() -> dict[str, object]:
     executable = boss_executable()
+    python_supported = supported_python()
+    installed = executable.is_file()
+    recruiter_ready = recruiter_available(executable)
+    state, next_action = readiness_state(
+        python_supported,
+        installed,
+        recruiter_ready,
+    )
     return {
-        "ok": supported_python(),
+        "ok": python_supported,
+        "schema_version": SCHEMA_VERSION,
+        "ready": state == "local_ready",
+        "state": state,
+        "next_action": next_action,
         "python": sys.executable,
         "python_version": platform.python_version(),
         "minimum_python": ".".join(map(str, MIN_PYTHON)),
         "runtime_root": str(runtime_root()),
         "package": PACKAGE_SPEC,
-        "installed": executable.is_file(),
-        "recruiter_available": recruiter_available(executable),
+        "installed": installed,
+        "recruiter_available": recruiter_ready,
         "boss_executable": str(executable),
-        "boss_version": command_output([str(executable), "--version"]) if executable.is_file() else None,
+        "boss_version": command_output([str(executable), "--version"]) if installed else None,
     }
 
 
