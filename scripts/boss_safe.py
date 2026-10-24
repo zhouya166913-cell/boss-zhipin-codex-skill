@@ -15,10 +15,10 @@ from bootstrap import boss_executable, runtime_python
 
 TOP_LEVEL_REMOTE_WRITES = {"greet", "batch-greet"}
 TOP_LEVEL_LOCAL_WRITES = {"export", "logout"}
+TOP_LEVEL_AUTH = {"login"}
 TOP_LEVEL_READS = {
     "--help",
     "--version",
-    "login",
     "status",
     "me",
     "search",
@@ -81,6 +81,8 @@ def classify(arguments: Sequence[str]) -> str:
         return "remote-write"
     if command[0] in TOP_LEVEL_LOCAL_WRITES:
         return "local-write"
+    if command[0] in TOP_LEVEL_AUTH:
+        return "auth"
     if command[0] in TOP_LEVEL_READS:
         return "read"
     if command[0] == "recruiter" and len(command) == 1:
@@ -104,7 +106,12 @@ def is_dry_run(arguments: Sequence[str]) -> bool:
     return "--dry-run" in normalized_command(arguments)
 
 
-def validate(arguments: Sequence[str], confirm_write: bool, allow_batch: bool) -> str | None:
+def validate(
+    arguments: Sequence[str],
+    confirm_write: bool,
+    allow_batch: bool,
+    confirm_auth: bool = False,
+) -> str | None:
     command = normalized_command(arguments)
     if not command:
         return "缺少 boss 命令。"
@@ -112,6 +119,11 @@ def validate(arguments: Sequence[str], confirm_write: bool, allow_batch: bool) -
     action_type = classify(command)
     if action_type == "unknown":
         return "已阻止未知命令。先检查当前 Skill 文档和 boss --help，不要把未知命令当作只读操作。"
+    if action_type == "auth" and not confirm_auth:
+        return (
+            "已阻止登录操作。先确认账号由本人使用、当前设备和地点正常，且账号近期没有"
+            "异常登录或 PC 端限制；取得用户明确同意后添加 --confirm-auth。"
+        )
     if action_type in {"remote-write", "local-write"} and not confirm_write:
         return (
             f"已阻止 {action_type} 操作。向用户展示准确对象与内容并取得明确确认后，"
@@ -126,6 +138,11 @@ def validate(arguments: Sequence[str], confirm_write: bool, allow_batch: bool) -
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="安全调用 boss-cli")
+    parser.add_argument(
+        "--confirm-auth",
+        action="store_true",
+        help="确认用户已批准在当前设备发起一次本人登录",
+    )
     parser.add_argument(
         "--confirm-write",
         action="store_true",
@@ -144,7 +161,7 @@ def main() -> int:
     configure_utf8_console()
     args = build_parser().parse_args()
     command = normalized_command(args.boss_args)
-    error = validate(command, args.confirm_write, args.allow_batch)
+    error = validate(command, args.confirm_write, args.allow_batch, args.confirm_auth)
     if error:
         print(error, file=sys.stderr)
         return 2

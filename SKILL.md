@@ -25,6 +25,7 @@ description: 连接 BOSS 直聘并执行招聘工作流，包括岗位画像、�
 2. 不读取、展示、复制或提交 Cookie、Token、`credential.json` 及浏览器凭证数据库。
 3. 不绕过验证码、风控、频率限制或平台安全机制，不承诺账号不会被限制。
 4. 首次准备时由 Codex 执行安装流程；运行时位于用户目录下的隔离虚拟环境，不修改项目 Python 环境。当前固定依赖为 `jackwener/boss-cli` 的提交 `9d38ed1`，因为已发布的 PyPI 包尚未包含招聘端命令。
+5. 在新电脑、WorkBuddy 或客户环境首次使用时，读取 [references/cross-device-onboarding.md](references/cross-device-onboarding.md)，先区分新客户账号与近期被限制的同一账号。
 
 ## 连接流程
 
@@ -33,17 +34,22 @@ description: 连接 BOSS 直聘并执行招聘工作流，包括岗位画像、�
 ```text
 <python> scripts/bootstrap.py check
 <python> scripts/bootstrap.py install
-<python> scripts/boss_safe.py -- login
+<python> scripts/boss_safe.py --confirm-auth -- login
 <python> scripts/boss_safe.py -- status --json
 ```
 
 - `check` 只检查环境，不安装依赖、不访问 BOSS。
 - `install` 创建隔离运行时并安装固定版本依赖。
-- `login` 必须由用户本人完成扫码或浏览器登录。不要索要 Cookie 文本。
+- `login` 是独立认证动作。只有用户明确确认账号由本人使用、当前设备和地点正常、且账号近期没有异常登录或 PC 端限制后，才添加 `--confirm-auth` 发起一次；扫码必须由用户本人完成。不要索要 Cookie 文本。
 - `status` 成功后，再执行实际业务命令。
 - 如果 Python 低于 3.10、安装失败或登录失败，读取 [references/troubleshooting.md](references/troubleshooting.md)。
 - 如果出现登录成功后反复掉线，同一任务只允许自动刷新凭证并复验一次；再次失败时停止重新登录循环，读取 [references/secondary-development.md](references/secondary-development.md) 的会话诊断流程。招聘场景以招聘端只读命令是否成功作为最终判断，不能只依赖求职端健康探针。
+- 如果官方浏览器页面正常，但招聘端只读命令返回 `code=7` 或 `code=37`，将其标记为“浏览器已登录、CLI 未认证”的分离状态。近期出现过 PC 端限制时不得同步 Cookie、刷新凭证或再次登录；降级为官方页面人工操作和离线招聘辅助。
 - 这些命令由 Codex 执行。除非用户主动排查技术问题，不把命令作为操作步骤交给用户。
+
+## 另一台电脑或 WorkBuddy
+
+用户询问如何在另一台电脑使用、需要复制提示词，或希望由 WorkBuddy 读取本项目时，读取 [references/cross-device-onboarding.md](references/cross-device-onboarding.md)。不要默认把同一账号的新设备当成安全环境，也不要把 WorkBuddy 的电脑操作或自定义 MCP 视为 BOSS 官方授权。
 
 ## 自然语言二次开发
 

@@ -16,6 +16,12 @@ SPEC.loader.exec_module(BOSS_SAFE)
 
 
 class ClassificationTests(unittest.TestCase):
+    def test_login_requires_explicit_auth_confirmation(self) -> None:
+        command = ["login", "--qrcode"]
+        self.assertEqual(BOSS_SAFE.classify(command), "auth")
+        self.assertIsNotNone(BOSS_SAFE.validate(command, False, False))
+        self.assertIsNone(BOSS_SAFE.validate(command, False, False, True))
+
     def test_recruiter_reads_are_allowed(self) -> None:
         for command in (
             ["recruiter", "jobs", "--json"],
@@ -72,6 +78,7 @@ class EntrypointTests(unittest.TestCase):
         ):
             build_parser.return_value.parse_args.return_value = Mock(
                 boss_args=["recruiter", "inbox", "--json"],
+                confirm_auth=False,
                 confirm_write=False,
                 allow_batch=False,
             )
